@@ -2,7 +2,10 @@ import MainStage from "./components/mainStage";
 
 const App = () => {
     return (
-        <MainStage />
+			<>
+				<button>add Rect</button>
+				<MainStage />
+			</>
     )
 }
 

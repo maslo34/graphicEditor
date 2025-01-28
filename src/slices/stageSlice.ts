@@ -1,17 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "./index";
-
-type Position = {
-  x: number;
-  y: number;
-}
-
-type OptionsStage = {
-  startX: number;
-  startY: number;
-  isDragging: boolean;
-} & Position
+import type { OptionsStage, Position } from "../types"
 
 const initialState: OptionsStage = {
   x: 0,
