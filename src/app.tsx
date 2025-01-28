@@ -1,9 +1,10 @@
 import MainStage from "./components/mainStage";
+import MenuShapes from "./components/menuAddShapes";
 
 const App = () => {
     return (
 			<>
-				<button>add Rect</button>
+				<MenuShapes />
 				<MainStage />
 			</>
     )

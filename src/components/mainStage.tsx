@@ -1,6 +1,9 @@
-import { Stage, Layer, Rect } from "react-konva";
+import { Stage, Layer } from "react-konva";
 import { KonvaEventObject } from "konva/lib/Node";
+
 import { useAppSelector, useAppDispatch } from "../hooks";
+
+import CollectionShapes from "./collectionShapesOnStage";
 
 import {
   setIsDragging,
@@ -8,17 +11,26 @@ import {
   setStartPosition,
 } from "../slices/stageSlice";
 
+import { addNewShape } from "../slices/shapesSlice";
+
 const MainStage = () => {
-  const stage = useAppSelector((state) => state.stage);
   const dispatch = useAppDispatch();
+	
+  const stage = useAppSelector((state) => state.stage);
+
+	const newShape = useAppSelector((state) => state.addShape)
+	console.log(newShape)
 
   const handleMouseDown = (e: KonvaEventObject<MouseEvent>) => {
+
+		if (newShape.isAdding) return
     dispatch(setIsDragging());
     const { x, y } = e.target.getStage()!.getPointerPosition()!;
     dispatch(setStartPosition({ x, y }));
   };
 
   const handleMouseMove = (e: KonvaEventObject<MouseEvent>) => {
+		if (newShape.isAdding) return
     if (!stage.isDragging) return;
 
     const { x, y } = e.target.getStage()!.getPointerPosition()!;
@@ -26,7 +38,17 @@ const MainStage = () => {
     dispatch(setPosition({ x, y }));
   };
 
-	const handleMouseUp = () => dispatch(setIsDragging())
+	const handleMouseUp = () => {
+		if (newShape.isAdding) return
+		dispatch(setIsDragging())
+	}
+
+	const handleStageClick = (e: KonvaEventObject<MouseEvent>) => {
+		if (!newShape.isAdding) return
+		const { x, y } = e.target.getStage()!.getPointerPosition()!;
+		dispatch(addNewShape({isDragging: false, x: x, y: y, name: newShape.name!}))
+	}
+
   console.log(stage);
   return (
     <Stage
@@ -38,10 +60,11 @@ const MainStage = () => {
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-			style={{cursor: stage.isDragging? 'grabbing': 'grab'}}
+			onClick={handleStageClick}
+			style={{cursor: stage.isDragging || newShape.isAdding? 'grabbing': 'grab'}}
     >
       <Layer>
-        <Rect x={0} y={0} width={100} height={100} fill="red" />
+        <CollectionShapes />
       </Layer>
     </Stage>
   );
