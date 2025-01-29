@@ -1,9 +1,11 @@
 import { Stage, Layer } from "react-konva";
 import { KonvaEventObject } from "konva/lib/Node";
+import { Vector2d } from "konva/lib/types";
 
 import { useAppSelector, useAppDispatch } from "../hooks";
 
 import CollectionShapes from "./collectionShapesOnStage";
+import Shape from "./shape";
 
 import {
   setIsDragging,
@@ -11,55 +13,79 @@ import {
   setScale,
   setStartPosition,
 } from "../slices/stageSlice";
-
+import {
+  setPositionShape,
+  setSizeShape,
+  addShapeInStage,
+} from "../slices/addShapeSlice";
 import { addNewShape } from "../slices/shapesSlice";
-import { Vector2d } from "konva/lib/types";
-import { addShapeOnStage } from "../slices/addShapeSlice";
 
 const MainStage = () => {
   const dispatch = useAppDispatch();
-  const { isAdding, name } = useAppSelector((state) => state.addShape);
+  const { methodAddShape, name, sizeShape, position } = useAppSelector(
+    (state) => state.addShape
+  );
   const { isDragging, x, y, scale } = useAppSelector((state) => state.stage);
-  console.log(isAdding)
-  const getPointerPosition = (e: KonvaEventObject<MouseEvent>):Vector2d => {
+  console.log(methodAddShape, name, sizeShape, position);
+  const getPointerPosition = (e: KonvaEventObject<MouseEvent>): Vector2d => {
     return e.target.getStage()?.getPointerPosition()!;
   };
 
-  const handleMouseDown = (e: KonvaEventObject<MouseEvent>) => {
-    if (isAdding) return;
-
-    dispatch(setIsDragging());
+  const handleAddShape = (e: KonvaEventObject<MouseEvent>) => {
     const { x, y } = getPointerPosition(e);
-    dispatch(setStartPosition({ x, y }));
+    dispatch(setPositionShape({ position: { x, y } }));
   };
 
-  const handleMouseMove = (e: KonvaEventObject<MouseEvent>) => {
-    if (isAdding || !isDragging) return;
+  const handleDrawingMouseMove = (e: KonvaEventObject<MouseEvent>) => {
+    const { x } = getPointerPosition(e);
+    if ( methodAddShape === 'add') {
+      dispatch(setSizeShape({ sizeShape: 100 }));
+      return;
+    }
+    if (position) {
+      const newSize = x - position.x;
+      dispatch(setSizeShape({ sizeShape: newSize }));
+    }
+  };
+
+  const handleStageMouseDown = (e: KonvaEventObject<MouseEvent>) => {
+    if (!methodAddShape) {
+      dispatch(setIsDragging());
+      const { x, y } = getPointerPosition(e);
+      dispatch(setStartPosition({ x, y }));
+      return;
+    } else {
+      handleAddShape(e);
+    }
+  };
+
+  const handleStageMouseMove = (e: KonvaEventObject<MouseEvent>) => {
+    if (methodAddShape || !isDragging) {
+      handleDrawingMouseMove(e);
+      return;
+    }
 
     const { x, y } = getPointerPosition(e);
     dispatch(setPosition({ x, y }));
   };
 
-  const handleMouseUp = () => {
-    if (!isAdding) {
+  const handleStageMouseUp = () => {
+    console.log("end");
+    if (isDragging) {
       dispatch(setIsDragging());
     }
-  };
-
-  const handleStageClick = (e: KonvaEventObject<MouseEvent>) => {
-    if (!isAdding) return;
-
-    const { x, y } = getPointerPosition(e);
-    dispatch(addNewShape({ isDragging: false, x: x, y: y, name: name! }));
-    dispatch(addShapeOnStage({isAdding: false}))
+    if (methodAddShape) {
+      dispatch(addNewShape({ sizeShape: sizeShape!, name: name!, x: position!.x, y: position!.y, isDragging: false, transparency: 1}))
+      dispatch(addShapeInStage())
+    }
   };
 
   const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
     e.evt.preventDefault();
-    const scaleBy = 1.1
-    const newScale = e.evt.deltaY > 0 ? scale / scaleBy: scale * scaleBy;
-    dispatch(setScale(newScale))
-  } 
+    const scaleBy = 1.1;
+    const newScale = e.evt.deltaY > 0 ? scale / scaleBy : scale * scaleBy;
+    dispatch(setScale(newScale));
+  };
 
   return (
     <Stage
@@ -70,15 +96,15 @@ const MainStage = () => {
       scaleX={scale}
       scaleY={scale}
       draggable={isDragging}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onClick={handleStageClick}
-      onWheel={(e) => handleWheel(e)}
-      style={{ cursor: isDragging || isAdding ? 'grabbing' : 'grab' }}
+      onMouseDown={handleStageMouseDown}
+      onMouseMove={handleStageMouseMove}
+      onMouseUp={handleStageMouseUp}
+      onWheel={handleWheel}
+      style={{ cursor: isDragging || methodAddShape ? "grabbing" : "grab" }}
     >
       <Layer>
         <CollectionShapes />
+        {position && name? <Shape name={name} x={position.x} y={position.y} isDragging={false} sizeShape={sizeShape} transparency={0.3}/>: <></>}
       </Layer>
     </Stage>
   );
