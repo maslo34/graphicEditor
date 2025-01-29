@@ -8,60 +8,74 @@ import CollectionShapes from "./collectionShapesOnStage";
 import {
   setIsDragging,
   setPosition,
+  setScale,
   setStartPosition,
 } from "../slices/stageSlice";
 
 import { addNewShape } from "../slices/shapesSlice";
+import { Vector2d } from "konva/lib/types";
+import { addShapeOnStage } from "../slices/addShapeSlice";
 
 const MainStage = () => {
   const dispatch = useAppDispatch();
-	
-  const stage = useAppSelector((state) => state.stage);
-
-	const newShape = useAppSelector((state) => state.addShape)
-	console.log(newShape)
+  const { isAdding, name } = useAppSelector((state) => state.addShape);
+  const { isDragging, x, y, scale } = useAppSelector((state) => state.stage);
+  console.log(isAdding)
+  const getPointerPosition = (e: KonvaEventObject<MouseEvent>):Vector2d => {
+    return e.target.getStage()?.getPointerPosition()!;
+  };
 
   const handleMouseDown = (e: KonvaEventObject<MouseEvent>) => {
+    if (isAdding) return;
 
-		if (newShape.isAdding) return
     dispatch(setIsDragging());
-    const { x, y } = e.target.getStage()!.getPointerPosition()!;
+    const { x, y } = getPointerPosition(e);
     dispatch(setStartPosition({ x, y }));
   };
 
   const handleMouseMove = (e: KonvaEventObject<MouseEvent>) => {
-		if (newShape.isAdding) return
-    if (!stage.isDragging) return;
+    if (isAdding || !isDragging) return;
 
-    const { x, y } = e.target.getStage()!.getPointerPosition()!;
-
+    const { x, y } = getPointerPosition(e);
     dispatch(setPosition({ x, y }));
   };
 
-	const handleMouseUp = () => {
-		if (newShape.isAdding) return
-		dispatch(setIsDragging())
-	}
+  const handleMouseUp = () => {
+    if (!isAdding) {
+      dispatch(setIsDragging());
+    }
+  };
 
-	const handleStageClick = (e: KonvaEventObject<MouseEvent>) => {
-		if (!newShape.isAdding) return
-		const { x, y } = e.target.getStage()!.getPointerPosition()!;
-		dispatch(addNewShape({isDragging: false, x: x, y: y, name: newShape.name!}))
-	}
+  const handleStageClick = (e: KonvaEventObject<MouseEvent>) => {
+    if (!isAdding) return;
 
-  console.log(stage);
+    const { x, y } = getPointerPosition(e);
+    dispatch(addNewShape({ isDragging: false, x: x, y: y, name: name! }));
+    dispatch(addShapeOnStage({isAdding: false}))
+  };
+
+  const handleWheel = (e: KonvaEventObject<WheelEvent>) => {
+    e.evt.preventDefault();
+    const scaleBy = 1.1
+    const newScale = e.evt.deltaY > 0 ? scale / scaleBy: scale * scaleBy;
+    dispatch(setScale(newScale))
+  } 
+
   return (
     <Stage
       width={window.innerWidth}
       height={window.innerHeight}
-      x={stage.x}
-      y={stage.y}
-      draggable={stage.isDragging}
+      x={x}
+      y={y}
+      scaleX={scale}
+      scaleY={scale}
+      draggable={isDragging}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
-			onClick={handleStageClick}
-			style={{cursor: stage.isDragging || newShape.isAdding? 'grabbing': 'grab'}}
+      onClick={handleStageClick}
+      onWheel={(e) => handleWheel(e)}
+      style={{ cursor: isDragging || isAdding ? 'grabbing' : 'grab' }}
     >
       <Layer>
         <CollectionShapes />

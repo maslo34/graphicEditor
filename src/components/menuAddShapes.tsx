@@ -5,9 +5,9 @@ const MenuShapes = () => {
 	const dispatch = useAppDispatch()
   return (
     <>
-      <button onClick={() => dispatch(addShapeOnStage({name: 'rect'}))}>add Rect</button>
-      <button onClick={() => dispatch(addShapeOnStage({name: 'circle'}))}>add Сircle</button>
-      <button onClick={() => dispatch(addShapeOnStage({name: 'line'}))}>add Triangle</button>
+      <button onClick={() => dispatch(addShapeOnStage({isAdding: true, name: 'rect'}))}>add Rect</button>
+      <button onClick={() => dispatch(addShapeOnStage({isAdding: true, name: 'circle'}))}>add Сircle</button>
+      <button onClick={() => dispatch(addShapeOnStage({isAdding: true, name: 'line'}))}>add Triangle</button>
     </>
   );
 };

@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, isAction } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "./index";
 import type { OptionsStage, Position } from "../types"
@@ -8,6 +8,7 @@ const initialState: OptionsStage = {
   y: 0,
   startX: 0,
   startY: 0,
+  scale: 1,
   isDragging: false,
 };
 
@@ -30,10 +31,13 @@ export const stageSlice = createSlice({
       state.startX = action.payload.x;
       state.startY = action.payload.y;
     },
+    setScale: (state, action: PayloadAction<number>) => {
+      state.scale = action.payload
+    }
   },
 });
 
-export const { setIsDragging, setPosition, setStartPosition } =
+export const { setIsDragging, setPosition, setStartPosition, setScale } =
   stageSlice.actions;
 export const selectorStage = (state: RootState) => state.stage;
 

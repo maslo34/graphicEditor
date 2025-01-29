@@ -13,11 +13,8 @@ export const addShapesSlise = createSlice({
   initialState,
   reducers: {
     addShapeOnStage: (state, action: PayloadAction<addShape>) => {
-      if (action.payload.name === state.name) {
-        state.isAdding = !state.isAdding;
-      } else {
-      	state.name = action.payload.name
-			}
+      state.name = action.payload.name
+      state.isAdding = !state.isAdding;
     },
   },
 });
