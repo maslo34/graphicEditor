@@ -33,6 +33,6 @@ export const addShapesSlise = createSlice({
 });
 
 export const { selectMetodAndShape, setPositionShape, setSizeShape, addShapeInStage } = addShapesSlise.actions;
-export const selectorShapes = (state: RootState) => state.addShape;
+export const selectorAddShape = (state: RootState) => state.addShape;
 
 export default addShapesSlise.reducer;

@@ -19,6 +19,7 @@ import {
   addShapeInStage,
 } from "../slices/addShapeSlice";
 import { addNewShape } from "../slices/shapesSlice";
+import { closeMenuShape } from "../slices/contexMenyShapeSlice"
 
 const MainStage = () => {
   const dispatch = useAppDispatch();
@@ -26,7 +27,8 @@ const MainStage = () => {
     (state) => state.addShape
   );
   const { isDragging, x, y, scale } = useAppSelector((state) => state.stage);
-  console.log(methodAddShape, name, sizeShape, position);
+  const { isContextMenuShape, ...rest} = useAppSelector((state) => state.contextMenuShape)
+ 
   const getPointerPosition = (e: KonvaEventObject<MouseEvent>): Vector2d => {
     return e.target.getStage()?.getPointerPosition()!;
   };
@@ -49,6 +51,7 @@ const MainStage = () => {
   };
 
   const handleStageMouseDown = (e: KonvaEventObject<MouseEvent>) => {
+    if (isContextMenuShape) dispatch(closeMenuShape())
     if (!methodAddShape) {
       dispatch(setIsDragging());
       const { x, y } = getPointerPosition(e);
@@ -87,6 +90,11 @@ const MainStage = () => {
     dispatch(setScale(newScale));
   };
 
+  // const handleCloseContextMenu = () => {
+  //   console.log('click')
+  //   if (isContextMenuShape) dispatch(closeMenuShape())
+  // }
+
   return (
     <Stage
       width={window.innerWidth}
@@ -100,6 +108,7 @@ const MainStage = () => {
       onMouseMove={handleStageMouseMove}
       onMouseUp={handleStageMouseUp}
       onWheel={handleWheel}
+      // onClick={handleCloseContextMenu}
       style={{ cursor: isDragging || methodAddShape ? "grabbing" : "grab" }}
     >
       <Layer>

@@ -1,8 +1,17 @@
 import { Line, Rect, Circle } from "react-konva";
+import { KonvaEventObject } from "konva/lib/Node";
+
 
 import type { Shape } from "../types";
+import { useAppDispatch } from "../hooks";
+import { openMenuShape } from "../slices/contexMenyShapeSlice";
 
 const Shape = (prop: Shape) => {
+  const dispatch = useAppDispatch();
+  const handleClickOnComponent = (e: KonvaEventObject<PointerEvent>) => {
+    e.evt.preventDefault()
+    dispatch(openMenuShape({isContextMenuShape: true, id: prop.id, position: { x: prop.x, y: prop.y}}))
+  };
   switch (prop.name) {
     case "rect":
       return (
@@ -12,6 +21,8 @@ const Shape = (prop: Shape) => {
           width={prop.sizeShape}
           height={prop.sizeShape}
           fill={`rgba(0, 255, 0, ${prop.transparency}`}
+          onContextMenu={handleClickOnComponent}
+          style={{ cursor: "context-menu", position: "absolute", zIndex: 1000 }}
         />
       );
     case "line":
