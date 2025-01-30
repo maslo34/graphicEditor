@@ -6,8 +6,10 @@
 
 Клонируйте репозиторий командой:
 - git clone git@github.com:maslo34/graphicEditor.git
+
 Установка зависимостей:
 - git init
+
 Запуск локального сервера:
 - npm run dev
 
