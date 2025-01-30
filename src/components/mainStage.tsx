@@ -78,7 +78,7 @@ const MainStage = () => {
       dispatch(setIsDragging());
     }
     if (methodAddShape) {
-      dispatch(addNewShape({ sizeShape: sizeShape!, name: name!, x: position!.x, y: position!.y, isDragging: false, transparency: 1}))
+      dispatch(addNewShape({ sizeShape: sizeShape!, name: name!, x: position!.x, y: position!.y, transparency: 1}))
       dispatch(addShapeInStage())
     }
   };
@@ -89,11 +89,6 @@ const MainStage = () => {
     const newScale = e.evt.deltaY > 0 ? scale / scaleBy : scale * scaleBy;
     dispatch(setScale(newScale));
   };
-
-  // const handleCloseContextMenu = () => {
-  //   console.log('click')
-  //   if (isContextMenuShape) dispatch(closeMenuShape())
-  // }
 
   return (
     <Stage
@@ -108,12 +103,11 @@ const MainStage = () => {
       onMouseMove={handleStageMouseMove}
       onMouseUp={handleStageMouseUp}
       onWheel={handleWheel}
-      // onClick={handleCloseContextMenu}
       style={{ cursor: isDragging || methodAddShape ? "grabbing" : "grab" }}
     >
       <Layer>
         <CollectionShapes />
-        {position && name? <Shape name={name} x={position.x} y={position.y} isDragging={false} sizeShape={sizeShape} transparency={0.3}/>: <></>}
+        {position && name? <Shape name={name} x={position.x} y={position.y} sizeShape={sizeShape} transparency={0.3}/>: <></>}
       </Layer>
     </Stage>
   );

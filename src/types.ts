@@ -12,11 +12,13 @@ export type OptionsStage = {
 
 export type Shape = {
   id?: string;
-  name: string;
-  isDragging: boolean;
+  name?: string;
+  color?: string;
   sizeShape?: number;
   transparency?: number;
-} & Position;
+  x?: number;
+  y?: number;
+};
 
 export type Shapes = {
   shapes: Shape[];
@@ -27,4 +29,10 @@ export type addNewShape = {
 	name?: string;
   sizeShape?: number;
   position?: Position;
+}
+
+export type ContextMenuShape = {
+  isContextMenuShape: boolean;
+  position?: Position;
+  id?: string;
 }

@@ -1,8 +1,20 @@
-import { useAppSelector } from "../hooks";
+import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "../hooks";
+import { changeColorShape } from "../slices/shapesSlice"
+import { closeMenuShape } from "../slices/contexMenyShapeSlice";
 
 const ContextMenuShape = () => {
+  const [isDropdown, setIsDropdown] = useState("none");
   const dataContextShape = useAppSelector((state) => state.contextMenuShape);
-	console.log(dataContextShape.isContextMenuShape)
+  const dispatch = useAppDispatch();
+
+  const handleSelectColorShape = (color: string) => {
+    console.log('awd')
+    dispatch(changeColorShape({ color: color, id: dataContextShape.id}))
+    dispatch(closeMenuShape())
+    setIsDropdown('none')
+  };
+
   return (
     <>
       {dataContextShape.isContextMenuShape ? (
@@ -18,11 +30,59 @@ const ContextMenuShape = () => {
             boxShadow: "2px 2px 5px rgba(0,0,0,0.3)",
           }}
         >
-          <li>
-            <button>change color</button>
+          <li
+            style={{
+              listStyle: "none",
+            }}
+          >
+            <button onClick={() => setIsDropdown("block")}>change color</button>
+            <div
+              style={{
+                display: isDropdown,
+              }}
+            >
+              <button
+                onClick={()=> handleSelectColorShape('red')}
+                style={{
+                  width: 20,
+                  height: 20,
+                  background: "red",
+                  border: "none",
+                }}
+              />
+              <button
+              onClick={()=> handleSelectColorShape('green')}
+                style={{
+                  width: 20,
+                  height: 20,
+                  background: "green",
+                  border: "none",
+                }}
+              />
+              <button
+              onClick={()=> handleSelectColorShape('blue')}
+                style={{
+                  width: 20,
+                  height: 20,
+                  background: "blue",
+                  border: "none",
+                }}
+              />
+              <button
+              onClick={()=> handleSelectColorShape('black')}
+                style={{
+                  width: 20,
+                  height: 20,
+                  background: "black",
+                  border: "none",
+                }}
+              />
+            </div>
           </li>
         </ul>
-      ): <></>}
+      ) : (
+        <></>
+      )}
     </>
   );
 };

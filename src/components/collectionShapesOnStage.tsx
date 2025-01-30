@@ -4,6 +4,7 @@ import Shape from "./shape"
 
 const CollectionShapes = () => {
 	const { shapes }= useAppSelector((state) => state.shapes)
+	console.log(shapes)
     return (
 			<>
 				{shapes.map((shape) => {
